@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application by Amshkh Labs pvt ltd</title>
+</head>
+<body style="background-image: url('{% static "images/Emoji_background.jpg"%}');">
+    <h1 style="color: linear-gradient(90deg, #FF930F 0%, #FFF95B 100%);">Group Name : {{groupname}}</h1>
+    <textarea id="chat-log" cols="100" rows="20" style="background: linear-gradient(90deg, #FF930F 0%, #FFF95B 100%);">
+        {% for chat in chats %}
+            {{chat.content}}
+        {% endfor %}
+     </textarea>
+    <br/><br/>
+    <input type="text" id="chat-message-input" size="85" style="background: linear-gradient(90deg, #6FF7E8 0%, #1F7EA1 100%);"><br/><br/>
+    <input type="button" value="Send" id="chat-message-submit" style=" height: 2.5em; width: 9em; background: green; color: aliceblue;">
+
+    {{ groupname|json_script:"group-name" }}
+
+    <script>
+        const groupName = JSON.parse(document.getElementById
+        ("group-name").textContent)
+        console.log("Group Name :", groupName)
+
+        let ws = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/jwsc/'
+            + groupName
+            + '/'
+        )
+
+        /* let ws = new WebSocket(                    // when you have to use asynchronous
+            'ws://'
+            + window.location.host
+            + '/ws/ajwsc/'
+            + groupName
+            + '/'
+        ) */
+
+        ws.onopen = function(){
+            console.log('WebSocket Connection Opened')
+        }
+
+        ws.onmessage = function(event){
+            console.log('Message Received from Server ', event.data)
+
+            const data = JSON.parse(event.data)
+            console.log('Data : ', data)
+            document.querySelector('#chat-log').value += (data.message) + '\n'
+        }
+
+        ws.onclose = function(event){
+            console.log('WebSocket Connection Closed', event)
+        }
+
+        document.getElementById("chat-message-submit").onclick =
+        function(event){
+            const messageInputDom = document.getElementById
+            ('chat-message-input')
+
+            const message = messageInputDom.value
+            ws.send(JSON.stringify({
+                'msg' : message
+            }))
+            messageInputDom.value = '';
+        }
+    </script>
+</body>
+</html>

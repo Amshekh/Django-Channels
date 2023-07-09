@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application by Amshkh Labs pvt ltd</title>
+</head>
+<body bgcolor="lightgrey">
+    <h1>Counter Webpage</h1>
+    <h2 id="count"></h2>
+    <script>
+        var ws = new WebSocket('ws://127.0.0.1:8000/ws/wsc/')
+        ws.onopen = function(){
+            ws.send('Hey! Message from Client')
+        }
+        ws.onmessage = function(event){
+            document.getElementById('count').innerText = event.data
+        }
+    </script>
+</body>
+</html>
